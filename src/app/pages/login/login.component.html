@@ -1,0 +1,22 @@
+<div class="card">
+  <h1>Se connecter</h1>
+  <form [formGroup]="fg" (ngSubmit)="submit()">
+    <div>
+      <span class="p-float-label">
+        <input pInputText formControlName="username">
+        <label>Nom d'utilisateur</label>
+      </span>
+    </div>
+
+    <div>
+      <span class="p-float-label">
+        <input pInputText type="password" formControlName="password">
+        <label>Mot de passe</label>
+      </span>
+    </div>
+
+    <div>
+      <p-button [loading]="loading" type="submit" severity="info" icon="pi pi-send" iconPos="right" label="Se connecter"></p-button>
+    </div>
+  </form>
+</div>

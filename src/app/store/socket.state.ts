@@ -55,7 +55,7 @@ export const socketReducer = createReducer(
       knownUsers = [...state.knownUsers, other]
     }
 
-    // si on a déjà charger la conversation
+    // si on a déjà chargé la conversation
     if(conversation) {
       // on ajoute le message à la conversation
       conversation = [...conversation, payload.message];

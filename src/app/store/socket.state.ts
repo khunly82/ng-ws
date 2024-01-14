@@ -77,10 +77,10 @@ export const selectSortedOtherUsers = createSelector(
       ...socket.connectedUsers.filter(u => socket.knownUsers.every(o => o.id !== u.id))
     ].filter(u => u.id !== session.id)
     .sort((u1, u2) => {
-      if(u2.isConnected === u2.isConnected) {
-        return u1.username.localeCompare(u2.username)
+      if(u1.isConnected !== u2.isConnected) {
+        return u1.isConnected ? -1 : 1;
       }
-      return u1.isConnected ? 1 : -1;
+      return u1.username.localeCompare(u2.username)
     })
   );
 

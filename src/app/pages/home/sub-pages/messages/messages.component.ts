@@ -43,16 +43,14 @@ export class MessagesComponent implements OnInit {
 
     // à chaque fois que l'id de la route change
     this._route.params.pipe(
-      tap(({id}) => {
-        this.otherId = id;
-        this.fg.reset();
-        this.loading = true;
-      }),
+      // on réinitialise les données locales
+      tap(({id}) => { this.otherId = id; this.fg.reset(); this.loading = true; }),
       // on cherche la conversation dans le store
       switchMap(({id}) => this._store.select(selectConversation(id))),
       switchMap((messages) => {
         // si on a pas encore chargé la conversation
         if(!messages) {
+          // on se connecte à l'api
           return this._conversationService.getByOtherId(this.otherId).pipe(
             // on met à jour le store
             tap(messages => this._store.dispatch(loadConversation({ user: this.otherId, messages }))

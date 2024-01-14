@@ -53,14 +53,16 @@ export class MessagesComponent implements OnInit {
       switchMap((messages) => {
         // si on a pas encore chargé la conversation
         if(!messages) {
-          return this._conversationService.getByOtherId(this.otherId)
+          return this._conversationService.getByOtherId(this.otherId).pipe(
+            tap(messages => 
+              // on met à jour le store
+              this._store.dispatch(loadConversation({ user: this.otherId, messages }))
+          ))
         }
         return of(messages)
       })
     ).subscribe(messages => {
       this.messages = messages;
-      // on met à jour le store
-      this._store.dispatch(loadConversation({ user: this.otherId, messages }));
       this.loading = false;
       setTimeout(() => {
         // scroller vers le message du bas à chaque nouveau message 

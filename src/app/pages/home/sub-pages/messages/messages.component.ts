@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Store } from '@ngrx/store';
 import { SocketState, loadConversation, selectConversation } from '../../../../store/socket.state';
 import { ActivatedRoute } from '@angular/router';
-import { iif, of, switchMap, tap } from 'rxjs';
+import { finalize, iif, of, switchMap, tap } from 'rxjs';
 import { ConversationService } from '../../../../services/conversation.service';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../../../../components/loader/loader.component';
@@ -59,10 +59,10 @@ export class MessagesComponent implements OnInit {
           ))
         }
         return of(messages)
-      })
+      }),
+      finalize(() => this.loading = false)
     ).subscribe(messages => {
       this.messages = messages;
-      this.loading = false;
       setTimeout(() => {
         // scroller vers le message du bas à chaque nouveau message 
         this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;

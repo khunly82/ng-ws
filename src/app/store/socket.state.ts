@@ -45,19 +45,22 @@ export const socketReducer = createReducer(
   }),
   on(newMessage, (state, payload) => {
     const conversations = {...state.conversations};
-
-    const conversationKey = payload.message.isSender ? payload.message.to.id : payload.message.from.id;
-
-    let conversation = conversations[conversationKey];
+    const other = payload.message.isSender ? payload.message.to : payload.message.from;
+    let conversation = conversations[other.id];
+    let knownUsers = state.knownUsers;
     
     if(conversation) {
+      if(!conversation.length) {
+        knownUsers = [...state.knownUsers, other]
+      }
       conversation = [...conversation, payload.message];
-      conversations[conversationKey] = conversation;
+      conversations[other.id] = conversation;
     }
     
     return {
       ...state,
-      conversations: conversations
+      knownUsers: knownUsers,
+      conversations: conversations,
     }
   }),
   on(sessionStop, () => initialValue)

@@ -55,6 +55,18 @@
             align-items: center;
             color: white;
             text-decoration: none;
+            justify-content: space-between;
+            > .status {
+              display: block;
+              height: 10px;
+              width: 10px;
+              border-radius: 50%;
+              border: 1px solid white;
+              background-color: var(--red-500);
+              &.connected {
+                background-color: var(--green-500);
+              }
+            }
           }
         }
       }

@@ -10,7 +10,7 @@
   <aside [ngClass]="{ open: menuOpen }">
     <ul>
       @for (user of users; track user.username) {
-        <li routerLinkActive="active"><a [routerLink]="['messages', user.id]">{{user.username}}</a></li>
+        <li routerLinkActive="active"><a [routerLink]="['messages', user.id]">{{user.username}} <span class="status" [ngClass]="{ connected: user.isConnected}"></span></a></li>
       }
     </ul>
   </aside>

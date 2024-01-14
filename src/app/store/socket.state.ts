@@ -4,17 +4,20 @@ import { SessionState, sessionStop } from "./session.state";
 import { MessageModel } from "../models/message.model";
 
 export const loadConnectedUsers = createAction('socket/loadConnectedUsers', props<{ users: UserModel[] }>());
+export const loadKnownUsers = createAction('socket/loadKnownUsers', props<{ users: UserModel[] }>());
 export const loadUsers = createAction('socket/loadUsers', props<{ users: UserModel[] }>());
 export const loadConversation = createAction('socket/loadConversation', props<{ user: string, messages: MessageModel[] }>());
 export const newMessage = createAction('socket/newMessage', props<{ message: MessageModel }>());
 
 export interface SocketState {
-  users: UserModel[],
+  connectedUsers: UserModel[],
+  knownUsers: UserModel[],
   conversations: {[key: string]: MessageModel[]}, 
 }
 
 const initialValue: SocketState = {
-  users: [],
+  connectedUsers: [],
+  knownUsers: [],
   conversations: {},
 }
 
@@ -23,7 +26,13 @@ export const socketReducer = createReducer(
   on(loadConnectedUsers, (state, payload) => {
     return {
       ...state,
-      users: payload.users.map(u => ({ ...u, isConnected : true }))
+      connectedUsers: payload.users.map(u => ({...u, isConnected: true}))
+    }
+  }),
+  on(loadKnownUsers, (state, payload) => {
+    return {
+      ...state,
+      knownUsers: payload.users.map(u => ({...u, isConnected: false}))
     }
   }),
   on(loadConversation, (state, payload) => {
@@ -57,12 +66,20 @@ export const socketReducer = createReducer(
 export const selectSortedOtherUsers = createSelector(
   (state: any) => state.socket, 
   (state: any) => state.session, 
-  (socket: SocketState, session: SessionState) => 
-    socket.users
-      .filter(u => u.id !== session.id)
-      .sort((u1, u2) => u1.username.localeCompare(u2.username)
-  ) 
-);
+  (socket: SocketState, session: SessionState) => [
+      ...socket.knownUsers.map(u => ({
+        ...u,
+        isConnected: socket.connectedUsers.some(cu => cu.id === u.id)
+      })),
+      ...socket.connectedUsers.filter(u => socket.knownUsers.every(o => o.id !== u.id))
+    ].filter(u => u.id !== session.id)
+    .sort((u1, u2) => {
+      if(u2.isConnected === u2.isConnected) {
+        return u1.username.localeCompare(u2.username)
+      }
+      return u1.isConnected ? 1 : -1;
+    })
+  );
 
 export const selectConversation = (id: string) => createSelector(
   (state: any) => state.socket,

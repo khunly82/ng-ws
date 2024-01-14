@@ -19,8 +19,6 @@ export class SocketService {
     private readonly _notificationService: NotificationService,
   ) { 
     _store.select(state => state.session).subscribe(session => {
-      console.log(session);
-      
       this.closeSocket();
       if(session.token) {
         this.createSocket(session.token);

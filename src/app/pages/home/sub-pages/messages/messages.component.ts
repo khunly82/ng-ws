@@ -41,28 +41,27 @@ export class MessagesComponent implements OnInit {
       message: [null, [Validators.required]]
     });
 
+    // à chaque fois que l'id de la route change
     this._route.params.pipe(
       tap(({id}) => {
         this.otherId = id;
         this.fg.reset();
         this.loading = true;
       }),
-      switchMap(({id}) => this._store.select(selectConversation(id)).pipe(
-        switchMap((messages) => 
-          iif(() => !!messages, 
-            // si le store a déjà chargé la conversation
-            of(messages),
-            // sinon on charge la conversation depuis le serveur 
-            this._conversationService.getByOtherId(id).pipe(
-              // on enregistre la conversation dans le store
-              tap(messages => this._store.dispatch(loadConversation({ user: id, messages })))
-            )
-          )
-        ),
-      )),
-      tap(() => this.loading = false)
+      // on cherche la conversation dans le store
+      switchMap(({id}) => this._store.select(selectConversation(id))),
+      switchMap((messages) => {
+        // si on a pas encore chargé la conversation
+        if(!messages) {
+          return this._conversationService.getByOtherId(this.otherId)
+        }
+        return of(messages)
+      })
     ).subscribe(messages => {
       this.messages = messages;
+      // on met à jour le store
+      this._store.dispatch(loadConversation({ user: this.otherId, messages }));
+      this.loading = false;
       setTimeout(() => {
         // scroller vers le message du bas à chaque nouveau message 
         this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;

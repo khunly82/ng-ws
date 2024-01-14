@@ -11,7 +11,7 @@ export class ConversationService {
     private readonly _http: HttpClient
   ) { }
 
-  getByOtherId(id: number) {
+  getByOtherId(id: string) {
     return this._http.get<MessageModel[]>('http://localhost:3000/message', {params: {
       otherId: id
     }});

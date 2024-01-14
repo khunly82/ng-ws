@@ -49,10 +49,15 @@ export const socketReducer = createReducer(
     let conversation = conversations[other.id];
     let knownUsers = state.knownUsers;
     
+    // si on a jamais communiquer avec l'utilisateur
+    if(knownUsers.every(u => u.id !== other.id)) {
+      // on ajoute l'utilisateur dans sa liste
+      knownUsers = [...state.knownUsers, other]
+    }
+
+    // si on a déjà charger la conversation
     if(conversation) {
-      if(!conversation.length) {
-        knownUsers = [...state.knownUsers, other]
-      }
+      // on ajoute le message à la conversation
       conversation = [...conversation, payload.message];
       conversations[other.id] = conversation;
     }

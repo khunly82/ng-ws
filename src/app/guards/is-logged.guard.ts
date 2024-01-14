@@ -12,7 +12,7 @@ export const IsLoggedGuard: CanActivateFn = (route, state) => {
   return token$.pipe(
     // tranformer un obs en un autre obs
     map(token => !!token),
-    // exécuter qq chose en plus sur le resulat de l'ob-
+    // exécuter qq chose en plus sur le resulat de l'obs
     tap(isConnected => {
       if(!isConnected) {
         router.navigate(['/login']);

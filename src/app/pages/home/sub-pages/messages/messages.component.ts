@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Store } from '@ngrx/store';
 import { SocketState, loadConversation, selectConversation } from '../../../../store/socket.state';
 import { ActivatedRoute } from '@angular/router';
-import { finalize, iif, of, switchMap, tap } from 'rxjs';
+import { iif, of, switchMap, tap } from 'rxjs';
 import { ConversationService } from '../../../../services/conversation.service';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../../../../components/loader/loader.component';
@@ -47,24 +47,22 @@ export class MessagesComponent implements OnInit {
       tap(({id}) => { this.otherId = id; this.fg.reset(); this.loading = true; }),
       // on cherche la conversation dans le store
       switchMap(({id}) => this._store.select(selectConversation(id))),
-      switchMap((messages) => {
+      switchMap((messages) => 
         // si on a pas encore chargé la conversation
-        if(!messages) {
+        iif(() => !messages,
           // on se connecte à l'api
-          return this._conversationService.getByOtherId(this.otherId).pipe(
+          this._conversationService.getByOtherId(this.otherId).pipe(
             // on met à jour le store
             tap(messages => this._store.dispatch(loadConversation({ user: this.otherId, messages }))
-          ))
-        }
-        return of(messages)
-      }),
-      finalize(() => this.loading = false)
+          )),
+          of(messages)
+        )
+      ),
     ).subscribe(messages => {
+      this.loading = false;
       this.messages = messages;
-      setTimeout(() => {
-        // scroller vers le message du bas à chaque nouveau message 
-        this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;
-      }, 100)
+      // scroller vers le message du bas à chaque nouveau message 
+      this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;
     });
   }
 

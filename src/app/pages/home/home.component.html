@@ -1,3 +1,24 @@
 <header>
-  <p-button size="small" icon="pi pi-power-off" (onClick)="logout()"></p-button>
+  <i class="menu-button pi pi-bars" (click)="menuOpen = !menuOpen"></i>
+  <div>
+    <p>{{ username }}</p>
+    <p-button size="small" severity="info" icon="pi pi-power-off" (onClick)="logout()"></p-button>
+  </div>
 </header>
+
+<div>
+  <aside [ngClass]="{ open: menuOpen }">
+    <ul>
+      @for (user of users; track user.username) {
+        <li routerLinkActive="active"><a [routerLink]="['messages', user.id]">{{user.username}}</a></li>
+      }
+    </ul>
+  </aside>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<footer>
+  &copy; BSTORM - 2024
+</footer>

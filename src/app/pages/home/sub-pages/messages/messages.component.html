@@ -1,0 +1,15 @@
+<ul #chat>
+  @for (message of messages; track message.id) {
+    <li appMessage [message]="message"></li>
+  } @empty {
+    <p>Aucun message</p>
+  }
+</ul>
+<form [formGroup]="fg" (ngSubmit)="send()">
+  <textarea pInputTextarea [autoResize]="true" rows="1" placeholder="Votre message ..." formControlName="message"></textarea>
+  <p-button size="small" type="submit" severity="primary" label="Envoyer" icon="pi pi-send" iconPos="right"></p-button>
+</form>
+@if (loading) {
+  <app-loader></app-loader>
+}
+

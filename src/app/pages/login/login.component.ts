@@ -5,11 +5,11 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
-import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { sessionStart } from '../../store/session.state';
 import { jwtDecode } from 'jwt-decode';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   standalone: true,
@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private readonly _fb: FormBuilder,
     private readonly _authService: AuthService,
-    private readonly _messageService: MessageService,
+    private readonly _notificationService: NotificationService,
     private readonly _router: Router,
     private readonly _store: Store,
   ) {}
@@ -52,10 +52,10 @@ export class LoginComponent implements OnInit {
       next: response => {
         this._router.navigate(['/']);
         const decoded: any = jwtDecode(response.token);
-        this._store.dispatch(sessionStart({ token: response.token, username: decoded.username }));
+        this._store.dispatch(sessionStart({ token: response.token, ...decoded }));
       },
-      error: err => {
-        this._messageService.add({ severity: 'error', summary: 'Bad credentials' });
+      error: _ => {
+        this._notificationService.error('Bad credentials');
       }
     });
   }

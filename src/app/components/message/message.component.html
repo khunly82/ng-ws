@@ -1,0 +1,11 @@
+@if (message) {
+  <div class="message" [ngClass]="{sender : message.isSender}">
+    <div class="header">
+      <span class="author" *ngIf="!message.isSender">{{ message.from.username }}</span>
+      <span class="date">{{ message.date | date : 'dd/MM/yyyy à HH:mm' }}</span>
+    </div>
+    <div class="bubble">
+      <p *ngFor="let p of message.message | splitLines">{{ p }}</p>
+    </div>
+  </div>
+}

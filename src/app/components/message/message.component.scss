@@ -1,0 +1,49 @@
+@keyframes appearing {
+  100% { opacity: 1; }
+}
+
+:host {
+  opacity: 0;
+  animation-name: appearing; 
+  animation-duration: 0.5s;
+  animation-timing-function: ease;
+  animation-delay: 0.5s;
+  animation-fill-mode: forwards;
+  width: 100%;
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--gray-800);
+      margin: 5px;
+      .date {
+        font-style: italic;
+      }
+      .author {
+        font-weight: bold;
+      }
+    }
+    .bubble {
+      padding: 20px;
+      color: white;
+      flex: 1;
+      background-color: var(--blue-500);
+      border-radius: 10px;
+      width: 80%;
+    }
+    &.sender {
+     align-items: flex-end;
+     .bubble {
+      background-color: var(--green-500);
+     }
+    }
+  }
+
+  
+}

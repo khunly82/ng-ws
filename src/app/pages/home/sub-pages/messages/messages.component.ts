@@ -54,9 +54,8 @@ export class MessagesComponent implements OnInit {
         // si on a pas encore chargé la conversation
         if(!messages) {
           return this._conversationService.getByOtherId(this.otherId).pipe(
-            tap(messages => 
-              // on met à jour le store
-              this._store.dispatch(loadConversation({ user: this.otherId, messages }))
+            // on met à jour le store
+            tap(messages => this._store.dispatch(loadConversation({ user: this.otherId, messages }))
           ))
         }
         return of(messages)

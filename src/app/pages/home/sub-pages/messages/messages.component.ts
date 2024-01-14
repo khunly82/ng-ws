@@ -61,8 +61,10 @@ export class MessagesComponent implements OnInit {
     ).subscribe(messages => {
       this.loading = false;
       this.messages = messages;
-      // scroller vers le message du bas à chaque nouveau message 
-      this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;
+      setTimeout(() => {
+        // scroller vers le bas à chaque nouveau message
+        this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;
+      }, 10);
     });
   }
 

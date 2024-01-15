@@ -40,8 +40,9 @@ export class MessagesComponent implements OnInit {
   ) {
     // création d'un signal sur l'id de la route
     const routeIdSignal = toSignal(this._route.params.pipe(map(({id}) => id)));
-    // à chaque fois que l'id de la route change
+    
     effect(() => {
+      // à chaque fois que l'id de la route change
       this.otherId = routeIdSignal();
       // on réinitialise les données locales
       this.fg.reset(); 

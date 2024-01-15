@@ -10,6 +10,7 @@ import { sessionReducer } from './store/session.state';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { socketReducer } from './store/socket.state';
 import { tokenInterceptor } from './interceptors/token.interceptor';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 
 export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionReducer<any> {
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideHttpClient(withInterceptors([tokenInterceptor])),
     provideStore({ session: sessionReducer, socket: socketReducer }, {metaReducers}),
+    provideStoreDevtools({ maxAge: 25 }),
     MessageService,
 ]
 };

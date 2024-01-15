@@ -7,7 +7,7 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   height: 100%;
   position: relative;
 
@@ -21,6 +21,17 @@
     gap: 10px;
     overflow-y: scroll;
     scroll-behavior: smooth;
+  }
+
+  .notification {
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--gray-800);
+    margin: 0;
+    opacity: 0;
+    &.isTyping {
+      opacity: 1;
+    }
   }
 
   form {

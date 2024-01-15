@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Socket } from 'ngx-socket-io';
 import { SessionState, sessionStop } from '../store/session.state';
-import { loadConnectedUsers, newMessage } from '../store/socket.state';
+import { loadConnectedUsers, newMessage, setIsTyping } from '../store/socket.state';
 import { UserModel } from '../models/user.model';
 import { NotificationService } from './notification.service';
 import { MessageModel } from '../models/message.model';
@@ -31,6 +31,13 @@ export class SocketService {
       message, 
       to: otherId, 
       date: new Date()
+    });
+  }
+
+  notifyIsTyping(to: string, isTyping: boolean) {
+    this._socket?.emit('notifyIsTyping', {
+      to, 
+      isTyping,
     });
   }
 
@@ -63,6 +70,10 @@ export class SocketService {
         this._notificationService.info(`Nouveau message de ${message.from.username}`, message.message, true);
       }
       this._store.dispatch(newMessage({message}));
+    });
+
+    this._socket.fromEvent<{ from: string, isTyping: boolean }>('isTyping').subscribe(data => {
+      this._store.dispatch(setIsTyping(data));
     });
   }
 

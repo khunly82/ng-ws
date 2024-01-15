@@ -5,6 +5,7 @@ import { MessageModel } from "../models/message.model";
 
 export const loadConnectedUsers = createAction('socket/loadConnectedUsers', props<{ users: UserModel[] }>());
 export const loadKnownUsers = createAction('socket/loadKnownUsers', props<{ users: UserModel[] }>());
+export const setIsTyping = createAction('socket/setIsTyping', props<{ from: string, isTyping: boolean }>());
 export const loadUsers = createAction('socket/loadUsers', props<{ users: UserModel[] }>());
 export const loadConversation = createAction('socket/loadConversation', props<{ user: string, messages: MessageModel[] }>());
 export const newMessage = createAction('socket/newMessage', props<{ message: MessageModel }>());
@@ -26,13 +27,27 @@ export const socketReducer = createReducer(
   on(loadConnectedUsers, (state, payload) => {
     return {
       ...state,
-      connectedUsers: payload.users.map(u => ({...u, isConnected: true}))
+      connectedUsers: payload.users.map(u => ({
+        ...u, 
+        isConnected: true, 
+        isTyping: state.knownUsers.find(ku => u.id === ku.id)?.isTyping ?? false
+      }))
     }
   }),
   on(loadKnownUsers, (state, payload) => {
     return {
       ...state,
-      knownUsers: payload.users.map(u => ({...u, isConnected: false}))
+      knownUsers: payload.users.map(u => ({...u, isConnected: false, isTyping: false}))
+    }
+  }),
+  on(setIsTyping, (state, payload) => {
+    let user = state.knownUsers.find(u => u.id === payload.from);
+    if(user) {
+      user = {...user, isTyping: payload.isTyping};
+    }
+    return {
+      ...state,
+      knownUsers: state.knownUsers.map(u => u.id === user?.id ? user : u)
     }
   }),
   on(loadConversation, (state, payload) => {
@@ -71,7 +86,7 @@ export const socketReducer = createReducer(
   on(sessionStop, () => initialValue)
 );
 
-export const selectSortedOtherUsers = createSelector(
+export const selectOtherUsers = createSelector(
   (state: any) => state.socket, 
   (state: any) => state.session, 
   (socket: SocketState, session: SessionState) => [
@@ -81,13 +96,23 @@ export const selectSortedOtherUsers = createSelector(
       })),
       ...socket.connectedUsers.filter(u => socket.knownUsers.every(o => o.id !== u.id))
     ].filter(u => u.id !== session.id)
-    .sort((u1, u2) => {
+);
+
+export const selectSortedOtherUsers = createSelector(
+  selectOtherUsers,
+  (users: UserModel[]) => 
+    users.sort((u1, u2) => {
       if(u1.isConnected !== u2.isConnected) {
         return u1.isConnected ? -1 : 1;
       }
       return u1.username.localeCompare(u2.username)
     })
-  );
+);
+
+export const selectUser = (id: string) => createSelector(
+  selectOtherUsers,
+  (users: UserModel[]) => users.find(u => u.id === id)
+);
 
 export const selectConversation = (id: string) => createSelector(
   (state: any) => state.socket,

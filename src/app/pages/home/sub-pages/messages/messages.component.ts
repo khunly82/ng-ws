@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MessageModel } from '../../../../models/message.model';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { SocketState, loadConversation, selectConversation } from '../../../../store/socket.state';
+import { SocketState, loadConversation, selectConversation, selectUser } from '../../../../store/socket.state';
 import { ActivatedRoute } from '@angular/router';
 import { iif, of, switchMap, tap } from 'rxjs';
 import { ConversationService } from '../../../../services/conversation.service';
@@ -12,6 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { SocketService } from '../../../../services/socket.service';
 import { MessageComponent } from '../../../../components/message/message.component';
+import { UserModel } from '../../../../models/user.model';
 @Component({
   standalone: true,
   imports: [CommonModule, LoaderComponent, FormsModule, ReactiveFormsModule, ButtonModule, InputTextareaModule, MessageComponent],
@@ -24,6 +25,7 @@ export class MessagesComponent implements OnInit {
   fg!: FormGroup;
   loading: boolean = false;
   otherId!: string;
+  other!: UserModel|undefined;
 
   @ViewChild('chat')
   list!: ElementRef;
@@ -38,7 +40,7 @@ export class MessagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.fg = this._fb.group({
-      message: [null, [Validators.required]]
+      message: []
     });
 
     // à chaque fois que l'id de la route change
@@ -66,10 +68,20 @@ export class MessagesComponent implements OnInit {
         this.list.nativeElement.scrollTop = this.list.nativeElement.scrollHeight;
       }, 10);
     });
+
+    this._route.params.pipe(
+      switchMap(({id}) => this._store.select(selectUser(id)))
+    ).subscribe(user => {
+      this.other = user;
+    });
+
+    this.fg.valueChanges.subscribe(({message}) => {
+      this._socketService.notifyIsTyping(this.otherId, !!message.length);
+    });
   }
 
   send() {
-    if(this.fg.invalid) {
+    if(!this.fg.value.message) {
       return;
     }
     this._socketService.sendMessage(this.otherId, this.fg.value.message);

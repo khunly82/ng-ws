@@ -5,9 +5,10 @@
     <p>Aucun message</p>
   }
 </ul>
+<small *ngIf="other" class="notification" [ngClass]="{isTyping: other.isTyping}">{{other.username}} est en train d'écrire ...</small>
 <form [formGroup]="fg" (ngSubmit)="send()">
   <textarea pInputTextarea [autoResize]="true" rows="1" placeholder="Votre message ..." formControlName="message"></textarea>
-  <p-button size="small" type="submit" severity="primary" label="Envoyer" icon="pi pi-send" iconPos="right"></p-button>
+  <p-button [disabled]="!fg.value.message" size="small" type="submit" severity="primary" label="Envoyer" icon="pi pi-send" iconPos="right"></p-button>
 </form>
 @if (loading) {
   <app-loader></app-loader>

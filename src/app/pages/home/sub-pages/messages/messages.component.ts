@@ -76,7 +76,7 @@ export class MessagesComponent implements OnInit {
     });
 
     this.fg.valueChanges.subscribe(({message}) => {
-      this._socketService.notifyIsTyping(this.otherId, !!message.length);
+      this._socketService.notifyIsTyping(this.otherId, !!message?.length);
     });
   }
 
